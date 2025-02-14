@@ -3,7 +3,7 @@
 #include <fstream>
 #include "Sushi.hh"
 
-Sushi my_shell; // New global var
+Sushi my_shell; // Global Sushi instance
 
 // Initialize the static constants
 const size_t Sushi::MAX_INPUT = 256;
@@ -15,36 +15,45 @@ int main(int argc, char *argv[])
     UNUSED(argc);
     UNUSED(argv);
 
-    // DZ: Moved to globals (not an error)
-    // Sushi sushi;
-
-    
     const char* home = std::getenv("HOME");
-    // DZ: No need to exit because "ok if missing"
     if (!home) {
         std::cerr << "Error: $HOME environment variable is not set." << std::endl;
         return EXIT_FAILURE;
     }
 
-    
     std::string config_file = std::string(home) + "/sushi.conf";
-    // DZ: Must check return value
-    my_shell.read_config(config_file.c_str(), true);
+    my_shell.read_config(config_file.c_str(), true); // ok_if_missing = true
 
-    while (true) {
+    while (!my_shell.get_exit_flag()) {
         std::cout << Sushi::DEFAULT_PROMPT;
         std::string command = my_shell.read_line(std::cin);
 
+        if (command.empty()) {
+            continue; 
+        }
+
         if (command == "exit") {
+            my_shell.set_exit_flag(); 
             break;
         }
 
-	// DZ: It's store_to_history's job to check
-        //if (!command.empty()) {
-            my_shell.store_to_history(command);
-            my_shell.show_history();
-	    //}
+        if (command[0] == '!') {
+            try {
+                int history_index = std::stoi(command.substr(1));
+                my_shell.re_parse(history_index); 
+            } catch (const std::invalid_argument&) {
+                std::cerr << "Error: Invalid history command." << std::endl;
+            }
+        } else {
+            int parse_result = my_shell.parse_command(command);
+            if (parse_result == 0) { 
+                my_shell.store_to_history(command);
+            } else { 
+                std::cerr << "Error: Invalid command syntax." << std::endl;
+            }
+        }
     }
 
+    std::cout << "Exiting sushi shell." << std::endl;
     return EXIT_SUCCESS;
 }

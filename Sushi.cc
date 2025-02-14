@@ -52,8 +52,10 @@ std::string* Sushi::unquote_and_dup(const char* s) {
     }
     std::string cmd = history[i - 1];
     int ret = parse_command(cmd);
-    if (ret != 0) {
-        history.push_back(cmd);
+    if (ret == 1) {  
+        std::cout << cmd << std::endl;  
+    } else {  
+        std::cerr << "Error: Invalid command syntax in history item " << i << std::endl;
     }
 }
 
@@ -78,13 +80,10 @@ std::string Sushi::read_line(std::istream& in) {
     }
 
     if (line.length() > MAX_INPUT) {
-        // DZ: How is it truncated? 
         line = line.substr(0, MAX_INPUT);
         std::cerr << "Line too long, truncated to " 
                   << MAX_INPUT << " characters." << std::endl;
     }
-
-    // DZ: The first condition is redundant 
     if (std::all_of(line.begin(), line.end(), [](char c){ return std::isspace(c); })) {
         return "";
     }

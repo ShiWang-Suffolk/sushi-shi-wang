@@ -1,0 +1,3 @@
+Main.o: Main.cc Sushi.hh
+Sushi.o: Sushi.cc Sushi.hh
+sushi_parse.o: sushi_parse.cc Sushi.hh
