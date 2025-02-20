@@ -1889,10 +1889,11 @@ void yyfree (void * ptr )
 
 // The function returns 0 if there are no syntax errors and 1, otherwise
 // Do not modify this function
-int Sushi::parse_command(const std::string &command) {
+int Sushi::parse_command(const std::string command) {
   YY_BUFFER_STATE buffer = yy_scan_string(command.c_str());
   int retval = yyparse();
   yy_delete_buffer(buffer);
   yylex_destroy();
   return retval;
 }
+

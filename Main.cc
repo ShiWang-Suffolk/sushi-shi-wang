@@ -15,6 +15,9 @@ int main(int argc, char *argv[])
     UNUSED(argc);
     UNUSED(argv);
 
+  // New function call
+  Sushi::prevent_interruption();
+  
     const char* home = std::getenv("HOME");
     if (!home) {
         std::cerr << "Error: $HOME environment variable is not set." << std::endl;
@@ -32,7 +35,9 @@ int main(int argc, char *argv[])
             continue; 
         }
 
-        if (command == "exit") {
+ 	// DZ: The parser will take care of this
+	/*
+       if (command == "exit") {
             my_shell.set_exit_flag(); 
             break;
         }
@@ -45,15 +50,18 @@ int main(int argc, char *argv[])
                 std::cerr << "Error: Invalid history command." << std::endl;
             }
         } else {
+	*/
             int parse_result = my_shell.parse_command(command);
             if (parse_result == 0) { 
                 my_shell.store_to_history(command);
-            } else { 
-                std::cerr << "Error: Invalid command syntax." << std::endl;
             }
-        }
+	    /*else { 
+                std::cerr << "Error: Invalid command syntax." << std::endl;
+		}
+		}*/
     }
 
-    std::cout << "Exiting sushi shell." << std::endl;
+    // DZ: Unnecessary message
+    // std::cout << "Exiting sushi shell." << std::endl;
     return EXIT_SUCCESS;
 }

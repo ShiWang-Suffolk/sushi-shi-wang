@@ -7,57 +7,6 @@
 #include <cstring>
 #include <cctype>
 #include <string>
-//The code was modified with LLM's suggestions
-
-typedef struct yy_buffer_state* YY_BUFFER_STATE;
-
-extern "C" {
-    typedef struct yy_buffer_state* YY_BUFFER_STATE;
-    int yyparse();
-    int yylex_destroy();
-    YY_BUFFER_STATE yy_scan_string(const char *str);
-    void yy_delete_buffer(YY_BUFFER_STATE);
-}
-
-
-std::string* Sushi::unquote_and_dup(const char* s) {
-    std::string result;
-  
-    for (const char *p = s; *p != '\0'; ++p) {
-        if (*p == '\\') {
-            ++p;
-            if (*p == '\0') {
-                break;
-            }
-            switch (*p) {
-                case 'n': result += '\n'; break;
-                case 't': result += '\t'; break;
-                // ...
-                default:
-                    result += '\\';
-                    result += *p;
-                    break;
-            }
-        } else {
-            result += *p;
-        }
-    }
-    return new std::string(result);
-  }
-
-  void Sushi::re_parse(int i) {
-    if (i <= 0 || i > (int)history.size()) {
-        std::cerr << "Error: !" << i << ": event not found\n";
-        return;
-    }
-    std::string cmd = history[i - 1];
-    int ret = parse_command(cmd);
-    if (ret == 1) {  
-        std::cout << cmd << std::endl;  
-    } else {  
-        std::cerr << "Error: Invalid command syntax in history item " << i << std::endl;
-    }
-}
 
 
 bool Sushi::get_exit_flag() const {
@@ -147,4 +96,38 @@ void Sushi::show_history() const {
     for (size_t i = 0; i < history.size(); ++i) {
         std::cout << (i + 1) << " " << history[i] << std::endl;
     }
+}
+
+//---------------------------------------------------------
+// New methods
+int Sushi::spawn(Program *exe, bool bg)
+{
+  // Must be implemented
+  UNUSED(exe);
+  UNUSED(bg);
+
+  return EXIT_SUCCESS;
+}
+
+void Sushi::prevent_interruption() {
+  // Must be implemented
+}
+
+void Sushi::refuse_to_die(int signo) {
+  // Must be implemented
+  UNUSED(signo);
+}
+
+char* const* Program::vector2array() {
+  // Must be implemented
+  return nullptr; 
+}
+
+void Program::free_array(char *const argv[]) {
+  // Must be implemented
+  UNUSED(argv);
+}
+
+Program::~Program() {
+  // Do not implement now
 }
