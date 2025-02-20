@@ -78,10 +78,14 @@ union YYSTYPE
 {
 #line 7 "sushi_yyparser.y"
 
-  std::string *s;
+  bool b;
   int i;
+  std::string *s;
+  std::vector <std::string*> *s_vec;
+  Program *p;
+  Redirection redir;
 
-#line 85 "sushi_yyparser.tab.h"
+#line 89 "sushi_yyparser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

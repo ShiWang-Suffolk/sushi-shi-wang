@@ -26,7 +26,7 @@ pwd             { return YY_SUSHI_PWD;  }
 cd              { return YY_SUSHI_CD;   }
 history         { return YY_SUSHI_HISTORY;   }
 
-"!"{digit}+        { yylval.i = std::atoi(yytext+1);
+"!"{digit}+     { yylval.i = std::atoi(yytext+1);
                   return YY_SUSHI_BANG; }
 \${alnum}+      { yylval.s = Sushi::getenv(yytext + 1);
                   return YY_SUSHI_TOK; }

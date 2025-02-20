@@ -44,7 +44,9 @@ bool Sushi::read_config(const char *fname, bool ok_if_missing)
   // Read the config file
   while(!config_file.eof()) {
     std::string line = read_line(config_file);
-    store_to_history(line);
+    if(!parse_command(line)) {
+      store_to_history(line);
+    }
   }
   
   return true; 
@@ -52,6 +54,7 @@ bool Sushi::read_config(const char *fname, bool ok_if_missing)
 
 void Sushi::store_to_history(std::string line)
 {
+  // Do not insert empty lines
   if (line.empty()) {
     return;    
   }
@@ -64,20 +67,63 @@ void Sushi::store_to_history(std::string line)
   history.emplace_back(line);
 }
 
-void Sushi::show_history() const
+void Sushi::show_history() 
 {
   int index = 1;
+
+  // `history` itself will be inserted
+  if (history.size() == HISTORY_LENGTH) {
+    history.pop_front();
+  }
+  
   for (const auto &cmd: history) {
     std::cout << std::setw(5) << index++ << "  " << cmd << std::endl;
   }
+  
+  // `history` itself will be inserted
+  std::cout << std::setw(5) << index++ << "  " << "history" << std::endl;
 }
 
 void Sushi::set_exit_flag()
 {
-  // To be implemented
+  exit_flag = true;
 }
 
 bool Sushi::get_exit_flag() const
 {
-  return false; // To be fixed
+  return exit_flag;
+}
+
+//---------------------------------------------------------
+// New methods
+int Sushi::spawn(Program *exe, bool bg)
+{
+  // Must be implemented
+  UNUSED(exe);
+  UNUSED(bg);
+
+  return EXIT_SUCCESS;
+}
+
+void Sushi::prevent_interruption() {
+  // Must be implemented
+}
+
+void Sushi::refuse_to_die(int signo) {
+  // Must be implemented
+  UNUSED(signo);
+}
+
+char* const* Program::vector2array() {
+  // Must be implemented
+  return nullptr; 
+}
+
+void Program::free_array(char *const argv[]) {
+  // Must be implemented
+  UNUSED(argv);
+}
+
+Program::~Program() {
+  // Do not implement now
 }
