@@ -29,9 +29,7 @@ private:
 
   // Helper methods
   // Converts the args to whatever `execvp` expects
-  char* const* vector2array();
-  // Frees the memory allocated by vector2array()
-  void free_array(char *const argv[]);
+
 
 public:
   Program(std::vector<std::string*> *args) : args(args) {};
@@ -39,6 +37,8 @@ public:
   void set_pipe(Program *pipe) { this->pipe = pipe; };
   void set_redir(Redirection &redir) { this->redir = redir; };
   std::string progname() { return *args->at(0); }
+  char* const* vector2array();
+  void free_array(char *const argv[]);
 };
 
 // Old class(es)

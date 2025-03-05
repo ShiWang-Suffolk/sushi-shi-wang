@@ -53,7 +53,8 @@ int main(int argc, char *argv[])
 	*/
             int parse_result = my_shell.parse_command(command);
             if (parse_result == 0) { 
-                my_shell.store_to_history(command);
+                std::string line = "test command";
+                my_shell.store_to_history(line);
             }
 	    /*else { 
                 std::cerr << "Error: Invalid command syntax." << std::endl;
