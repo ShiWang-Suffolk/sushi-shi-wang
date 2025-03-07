@@ -1,68 +1,43 @@
 #include <cstdlib>
-#include <iostream>
-#include <fstream>
 #include "Sushi.hh"
 
-Sushi my_shell; // Global Sushi instance
-
 // Initialize the static constants
-const size_t Sushi::MAX_INPUT = 256;
-const size_t Sushi::HISTORY_LENGTH = 10;
+Sushi my_shell; 
 const std::string Sushi::DEFAULT_PROMPT = "sushi> ";
+const std::string Sushi::DEFAULT_CONFIG = "sushi.conf";
 
 int main(int argc, char *argv[])
 {
-    UNUSED(argc);
-    UNUSED(argv);
-
-  // New function call
+  // Use argc and argv!
+  
+  // Move this into the constructor
+  //-------------------------------------------
   Sushi::prevent_interruption();
   
-    const char* home = std::getenv("HOME");
-    if (!home) {
-        std::cerr << "Error: $HOME environment variable is not set." << std::endl;
-        return EXIT_FAILURE;
+  const char *home_dir = std::getenv("HOME");
+  // OK if missing!
+  if (home_dir) {
+    std::string config_path = std::string(home_dir) + "/" + Sushi::DEFAULT_CONFIG;
+    my_shell.read_config(config_path.c_str(), true);
+  }
+  //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  // Move this into the main loop method
+  //-------------------------------------------
+  while(!my_shell.get_exit_flag()) {
+    std::cout << Sushi::DEFAULT_PROMPT;
+    std::string command = Sushi::read_line(std::cin);
+    if(!Sushi::parse_command(command)) {
+      // Re-execute from history if needed
+      if(!my_shell.re_execute()) {
+	// Do not insert the bangs (!)
+	my_shell.store_to_history(command);
+      }
     }
+  }
+  //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    std::string config_file = std::string(home) + "/sushi.conf";
-    my_shell.read_config(config_file.c_str(), true); // ok_if_missing = true
-
-    while (!my_shell.get_exit_flag()) {
-        std::cout << Sushi::DEFAULT_PROMPT;
-        std::string command = my_shell.read_line(std::cin);
-
-        if (command.empty()) {
-            continue; 
-        }
-
- 	// DZ: The parser will take care of this
-	/*
-       if (command == "exit") {
-            my_shell.set_exit_flag(); 
-            break;
-        }
-
-        if (command[0] == '!') {
-            try {
-                int history_index = std::stoi(command.substr(1));
-                my_shell.re_parse(history_index); 
-            } catch (const std::invalid_argument&) {
-                std::cerr << "Error: Invalid history command." << std::endl;
-            }
-        } else {
-	*/
-            int parse_result = my_shell.parse_command(command);
-            if (parse_result == 0) { 
-                std::string line = "test command";
-                my_shell.store_to_history(line);
-            }
-	    /*else { 
-                std::cerr << "Error: Invalid command syntax." << std::endl;
-		}
-		}*/
-    }
-
-    // DZ: Unnecessary message
-    // std::cout << "Exiting sushi shell." << std::endl;
-    return EXIT_SUCCESS;
+  // my_shell.mainloop();
+  
+  return EXIT_SUCCESS;
 }

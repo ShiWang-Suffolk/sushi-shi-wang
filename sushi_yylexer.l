@@ -9,6 +9,7 @@ extern int yyparse(void);
 %}
 
 %option noyywrap
+%option nounput
 
 digit         [0-9]
 letter        [a-zA-Z_]

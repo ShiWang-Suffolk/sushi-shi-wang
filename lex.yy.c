@@ -553,8 +553,6 @@ extern int yywrap ( void );
 
 #ifndef YY_NO_UNPUT
     
-    static void yyunput ( int c, char *buf_ptr  );
-    
 #endif
 
 #ifndef yytext_ptr
@@ -709,9 +707,9 @@ YY_DECL
 		}
 
 	{
-#line 21 "sushi_yylexer.l"
+#line 22 "sushi_yylexer.l"
 
-#line 715 "lex.yy.c"
+#line 713 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -771,115 +769,115 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 22 "sushi_yylexer.l"
+#line 23 "sushi_yylexer.l"
 { /* comment */ }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 24 "sushi_yylexer.l"
+#line 25 "sushi_yylexer.l"
 { return YY_SUSHI_EXIT; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 25 "sushi_yylexer.l"
+#line 26 "sushi_yylexer.l"
 { return YY_SUSHI_PWD;  }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 26 "sushi_yylexer.l"
+#line 27 "sushi_yylexer.l"
 { return YY_SUSHI_CD;   }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 27 "sushi_yylexer.l"
+#line 28 "sushi_yylexer.l"
 { return YY_SUSHI_HISTORY;   }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 29 "sushi_yylexer.l"
+#line 30 "sushi_yylexer.l"
 { yylval.i = std::atoi(yytext+1);
                   return YY_SUSHI_BANG; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 31 "sushi_yylexer.l"
+#line 32 "sushi_yylexer.l"
 { yylval.s = Sushi::getenv(yytext + 1);
                   return YY_SUSHI_TOK; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 33 "sushi_yylexer.l"
+#line 34 "sushi_yylexer.l"
 { yylval.s = Sushi::unquote_and_dup(yytext);
                   return YY_SUSHI_TOK; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 35 "sushi_yylexer.l"
+#line 36 "sushi_yylexer.l"
 { yytext[strlen(yytext) - 1] = 0;
                   yylval.s = new std::string(yytext + 1);
                   return YY_SUSHI_TOK; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 38 "sushi_yylexer.l"
+#line 39 "sushi_yylexer.l"
 { yytext[strlen(yytext) - 1] = 0;
   yylval.s = Sushi::unquote_and_dup(yytext + 1);
                   return YY_SUSHI_TOK; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 42 "sushi_yylexer.l"
+#line 43 "sushi_yylexer.l"
 { return YY_SUSHI_LESS;     }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 43 "sushi_yylexer.l"
+#line 44 "sushi_yylexer.l"
 { return YY_SUSHI_MORE;     }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 44 "sushi_yylexer.l"
+#line 45 "sushi_yylexer.l"
 { return YY_SUSHI_MOREMORE; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 45 "sushi_yylexer.l"
+#line 46 "sushi_yylexer.l"
 { return YY_SUSHI_AMP;      }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 46 "sushi_yylexer.l"
+#line 47 "sushi_yylexer.l"
 { return YY_SUSHI_BAR;      }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 47 "sushi_yylexer.l"
+#line 48 "sushi_yylexer.l"
 { return YY_SUSHI_SET;      }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 49 "sushi_yylexer.l"
+#line 50 "sushi_yylexer.l"
 { std::cerr << "Unsupported command: " << yytext[0] << std::endl;
                   return YY_SUSHI_UNKNOWN;}
 	YY_BREAK
 case 18:
 /* rule 18 can match eol */
 YY_RULE_SETUP
-#line 51 "sushi_yylexer.l"
+#line 52 "sushi_yylexer.l"
 { /* ignore the whitespaces */ }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 53 "sushi_yylexer.l"
+#line 54 "sushi_yylexer.l"
 { std::cerr << "Illegal character: " <<  yytext[0] << std::endl;
                   return YY_SUSHI_UNKNOWN; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 56 "sushi_yylexer.l"
+#line 57 "sushi_yylexer.l"
 ECHO;
 	YY_BREAK
-#line 883 "lex.yy.c"
+#line 881 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1214,43 +1212,6 @@ static int yy_get_next_buffer (void)
 }
 
 #ifndef YY_NO_UNPUT
-
-    static void yyunput (int c, char * yy_bp )
-{
-	char *yy_cp;
-    
-    yy_cp = (yy_c_buf_p);
-
-	/* undo effects of setting up yytext */
-	*yy_cp = (yy_hold_char);
-
-	if ( yy_cp < YY_CURRENT_BUFFER_LVALUE->yy_ch_buf + 2 )
-		{ /* need to shift things up to make room */
-		/* +2 for EOB chars. */
-		int number_to_move = (yy_n_chars) + 2;
-		char *dest = &YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[
-					YY_CURRENT_BUFFER_LVALUE->yy_buf_size + 2];
-		char *source =
-				&YY_CURRENT_BUFFER_LVALUE->yy_ch_buf[number_to_move];
-
-		while ( source > YY_CURRENT_BUFFER_LVALUE->yy_ch_buf )
-			*--dest = *--source;
-
-		yy_cp += (int) (dest - source);
-		yy_bp += (int) (dest - source);
-		YY_CURRENT_BUFFER_LVALUE->yy_n_chars =
-			(yy_n_chars) = (int) YY_CURRENT_BUFFER_LVALUE->yy_buf_size;
-
-		if ( yy_cp < YY_CURRENT_BUFFER_LVALUE->yy_ch_buf + 2 )
-			YY_FATAL_ERROR( "flex scanner push-back overflow" );
-		}
-
-	*--yy_cp = (char) c;
-
-	(yytext_ptr) = yy_bp;
-	(yy_hold_char) = *yy_cp;
-	(yy_c_buf_p) = yy_cp;
-}
 
 #endif
 
@@ -1884,7 +1845,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 56 "sushi_yylexer.l"
+#line 57 "sushi_yylexer.l"
 
 
 // The function returns 0 if there are no syntax errors and 1, otherwise
