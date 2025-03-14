@@ -12,10 +12,10 @@ const std::string Sushi::DEFAULT_PROMPT = "sushi> ";
 
 int main(int argc, char *argv[])
 {
-    UNUSED(argc);
-    UNUSED(argv);
-
-  // New function call
+  // Use argc and argv!
+  
+  // Move this into the constructor
+  //-------------------------------------------
   Sushi::prevent_interruption();
   
     const char* home = std::getenv("HOME");
@@ -27,7 +27,11 @@ int main(int argc, char *argv[])
     std::string config_file = std::string(home) + "/sushi.conf";
     my_shell.read_config(config_file.c_str(), true); // ok_if_missing = true
 
-    while (!my_shell.get_exit_flag()) {
+   //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  // Move this into the main loop method
+  //-------------------------------------------
+   while (!my_shell.get_exit_flag()) {
         std::cout << Sushi::DEFAULT_PROMPT;
         std::string command = my_shell.read_line(std::cin);
 
@@ -53,7 +57,8 @@ int main(int argc, char *argv[])
 	*/
             int parse_result = my_shell.parse_command(command);
             if (parse_result == 0) { 
-                std::string line = "test command";
+ 	    // DZ: ????
+               std::string line = "test command";
                 my_shell.store_to_history(line);
             }
 	    /*else { 
@@ -61,6 +66,9 @@ int main(int argc, char *argv[])
 		}
 		}*/
     }
+  //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  my_shell.mainloop();
 
     // DZ: Unnecessary message
     // std::cout << "Exiting sushi shell." << std::endl;

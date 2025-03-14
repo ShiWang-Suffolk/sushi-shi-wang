@@ -125,7 +125,9 @@ int Sushi::spawn(Program *exe, bool bg)
         }
         execvp(argv[0], argv);
         // If the execution reaches this point, it means that execvp has an error.
-        std::perror("execvp");
+	// DZ: Incorrectr use of perror
+        // std::perror("execvp");
+        std::perror(argv[0]);
         exe->free_array(argv);
         exit(EXIT_FAILURE); // End the child process
     } else {
@@ -134,11 +136,13 @@ int Sushi::spawn(Program *exe, bool bg)
             std::perror("waitpid");
             return EXIT_FAILURE;
         }
+	// DZ: Incorrect, does not match the description
+	/*
         if (WIFEXITED(status)) {
             return WEXITSTATUS(status);
         } else {
             return EXIT_FAILURE;
-        }
+	    }*/
     }
     return EXIT_SUCCESS;
 }
@@ -161,6 +165,10 @@ void Sushi::refuse_to_die(int signo) {
     }
 }
 
+void Sushi::mainloop() {
+  // Must be implemented
+}
+
 char* const* Program::vector2array() {
     if (args==nullptr || args->empty()) {
         return nullptr;
@@ -173,6 +181,8 @@ char* const* Program::vector2array() {
     }
 
     for (size_t i = 0; i < count; i++) {
+      // DZ: This piece of code is unnecessary because of `char* CONST*`
+      // DZ: Do not copy without necessity
         std::string* s = args->at(i); // strdup dynamically allocates and copies the string content, which needs to be freed later
         argv[i] = ::strdup(s->c_str());
         if (!argv[i]) {
@@ -189,6 +199,7 @@ char* const* Program::vector2array() {
 
 void Program::free_array(char *const argv[]) {
     if (!argv) return;
+    // DZ: See above
     for (size_t i = 0; argv[i] != nullptr; i++) {
         ::free(argv[i]);
     }

@@ -42,7 +42,7 @@ cmdline:
 %empty /* an empty line is valid, too! Do nothing */ 
 | redir_exe bg_mode    { my_shell.spawn($1, $2); }
 | in_exe pipe bg_mode  { $1->set_pipe($2); my_shell.spawn($1, $3); }
-| arg YY_SUSHI_SET arg // Not implemented yet
+| arg YY_SUSHI_SET arg { my_shell.putenv($1, $3); }
 | YY_SUSHI_PWD         // Not implemented yet
 | YY_SUSHI_CD arg      // Not implemented yet
 | YY_SUSHI_HISTORY { my_shell.show_history(); }

@@ -68,10 +68,17 @@ std::string* Sushi::unquote_and_dup(const char* s) {
 }
 
 //---------------------------------------------------------------
-// Do not modify this function YET
+// Implement the function
 std::string *Sushi::getenv(const char* s) 
 {
   return new std::string(s); // Must be changed - eventually
+}
+
+// Implement the function
+void Sushi::putenv(const std::string* name, const std::string* value)
+{
+  UNUSED(name);
+  UNUSED(value);
 }
 
 //---------------------------------------------------------------
