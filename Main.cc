@@ -22,13 +22,13 @@ int main(int argc, char *argv[])
       std::string config_file = std::string(home) + "/sushi.conf";
       my_shell.read_config(config_file.c_str(), /*ok_if_missing=*/true);
   
-      //Processing command line arguments
+      //Processing
       bool anyScript = false;
       for (int i = 1; i < argc; i++) {
           bool ok = my_shell.read_config(argv[i], /*ok_if_missing=*/false);
           if (!ok) {
               std::cerr << "Error reading script: " << argv[i] << std::endl;
-              return EXIT_FAILURE; // Exit if the script cannot be read
+              return EXIT_FAILURE;
           }
           anyScript = true;
           if (my_shell.get_exit_flag()) {
