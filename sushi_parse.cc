@@ -1,8 +1,7 @@
 #include "Sushi.hh"
+#include <cstring>
 
 
-// DZ: ???
-//The code was modified with LLM's suggestions
 /*
 typedef struct yy_buffer_state* YY_BUFFER_STATE;
 
@@ -71,14 +70,26 @@ std::string* Sushi::unquote_and_dup(const char* s) {
 // Implement the function
 std::string *Sushi::getenv(const char* s) 
 {
-  return new std::string(s); // Must be changed - eventually
+  if (!s) {
+    return new std::string("");
 }
 
-// Implement the function
+const char* val = std::getenv(s);
+if (val == nullptr) {
+    return new std::string("");
+}
+return new std::string(val);
+}
+
 void Sushi::putenv(const std::string* name, const std::string* value)
 {
-  UNUSED(name);
-  UNUSED(value);
+  if (!name || !value) {
+    // If the pointer is invalid, return directly
+    return;
+}
+std::string envLine = *name + "=" + *value;
+char* cenv = ::strdup(envLine.c_str());
+::putenv(cenv);
 }
 
 //---------------------------------------------------------------

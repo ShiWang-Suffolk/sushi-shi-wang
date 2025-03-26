@@ -107,9 +107,6 @@ void Sushi::show_history() const {
 // New methods
 int Sushi::spawn(Program *exe, bool bg)
 {
-    (void) bg; 
-
-    // fork
     pid_t pid = fork();
     if (pid < 0) {
         std::perror("fork");
@@ -117,34 +114,41 @@ int Sushi::spawn(Program *exe, bool bg)
     }
 
     if (pid == 0) {
-        char* const* argv = exe->vector2array();
-        if (argv == nullptr) {
-            // Out of memory or other error
-            std::perror("vector2array failed");
-            exit(EXIT_FAILURE);
+        // subprocess
+        char *const* argv = exe->vector2array();
+        if (!argv) {
+            std::perror("vector2array returned null");
+            _exit(127); 
         }
         execvp(argv[0], argv);
-        // If the execution reaches this point, it means that execvp has an error.
-	// DZ: Incorrectr use of perror
-        // std::perror("execvp");
-        std::perror(argv[0]);
+        // if execvp fail
+        std::perror(argv[0]); 
         exe->free_array(argv);
-        exit(EXIT_FAILURE); // End the child process
+        _exit(127);
     } else {
-        int status = 0;
-        if (waitpid(pid, &status, 0) < 0) {
-            std::perror("waitpid");
-            return EXIT_FAILURE;
+        // parent process
+        if (!bg) {
+           
+            int status = 0;
+            if (waitpid(pid, &status, 0) < 0) {
+                std::perror("waitpid");
+                return EXIT_FAILURE;
+            }
+            int code = 0;
+            if (WIFEXITED(status)) {
+                code = WEXITSTATUS(status); 
+            } else if (WIFSIGNALED(status)) {
+                code = 128 + WTERMSIG(status);
+            }
+            Sushi::putenv(
+                new std::string("?"), 
+                new std::string(std::to_string(code))
+            );
+            return code;
+
+            
         }
-	// DZ: Incorrect, does not match the description
-	/*
-        if (WIFEXITED(status)) {
-            return WEXITSTATUS(status);
-        } else {
-            return EXIT_FAILURE;
-	    }*/
     }
-    return EXIT_SUCCESS;
 }
 
 void Sushi::prevent_interruption() {
@@ -166,7 +170,32 @@ void Sushi::refuse_to_die(int signo) {
 }
 
 void Sushi::mainloop() {
-  // Must be implemented
+        while (!get_exit_flag()) {
+            std::string ps1_default = "sushi> ";
+            std::string *ps1_val = Sushi::getenv("PS1");
+            std::string ps1 = ps1_val ? *ps1_val : "";
+            delete ps1_val;
+            if (ps1.empty()) {
+                ps1 = ps1_default;
+            }
+    
+            // Output Prompt
+            std::cout << ps1;
+            std::cout.flush();
+            std::string line = read_line(std::cin);
+            // If the read fails or EOF is reached, exit the loop
+            if (!std::cin) {
+                break;
+            }
+            if (line.empty()) {
+                continue;
+            }
+            int ret = parse_command(line);
+            if (ret != 0) {
+                store_to_history(line);
+            }
+        }
+        std::cout << "Shell exiting...\n";
 }
 
 char* const* Program::vector2array() {
