@@ -9,6 +9,7 @@ extern int yyparse(void);
 %}
 
 %option noyywrap
+%option nounput
 
 digit         [0-9]
 letter        [a-zA-Z_]
@@ -28,7 +29,7 @@ history         { return YY_SUSHI_HISTORY;   }
 
 "!"{digit}+     { yylval.i = std::atoi(yytext+1);
                   return YY_SUSHI_BANG; }
-\$({alnum}+|\?)     { yylval.s = Sushi::getenv(yytext + 1);
+\$({alnum}+|\?)      { yylval.s = Sushi::getenv(yytext + 1);
                   return YY_SUSHI_TOK; }
 {permitted}+    { yylval.s = Sushi::unquote_and_dup(yytext);
                   return YY_SUSHI_TOK; }
