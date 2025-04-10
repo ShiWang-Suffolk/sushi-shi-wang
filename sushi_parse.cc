@@ -86,9 +86,11 @@ void Sushi::putenv(const std::string* name, const std::string* value)
   if (!name || !value) {
     // If the pointer is invalid, return directly
     return;
-}
+  }
 std::string envLine = *name + "=" + *value;
-char* cenv = ::strdup(envLine.c_str());
+// DZ: strdup() creates memory leaks
+//char* cenv = ::strdup(envLine.c_str());
+ char* cenv = const_cast<char*>(envLine.c_str());
 ::putenv(cenv);
 }
 

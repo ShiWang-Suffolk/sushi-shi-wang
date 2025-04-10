@@ -124,7 +124,8 @@ int Sushi::spawn(Program *exe, bool bg)
         // if execvp fail
         std::perror(argv[0]); 
         exe->free_array(argv);
-        _exit(127);
+	// DZ: Wrong exit value
+        _exit(EXIT_FAILURE/*127*/);
     } else {
         // parent process
         if (!bg) {
@@ -140,21 +141,25 @@ int Sushi::spawn(Program *exe, bool bg)
             } else if (WIFSIGNALED(status)) {
                 code = 128 + WTERMSIG(status);
             }
+	    // DZ: Cannot use putenv for `?`, must use setenv
             Sushi::putenv(
                 new std::string("?"), 
                 new std::string(std::to_string(code))
             );
-            return code;
+	    // DZ: no
+            // return code;
 
             
         }
     }
+    // DZ: Missing return value
+    return EXIT_SUCCESS;
 }
 
 void Sushi::prevent_interruption() {
     struct sigaction sa;
     std::memset(&sa, 0, sizeof(sa));
-    sa.sa_handler =Sushi::refuse_to_die;
+    sa.sa_handler =/*Sushi::*/refuse_to_die;
     sa.sa_flags=SA_RESTART;           // Avoid system calls interrupted by signals returning errors
 
     if (sigaction(SIGINT, &sa, nullptr) < 0) {
@@ -171,12 +176,13 @@ void Sushi::refuse_to_die(int signo) {
 
 void Sushi::mainloop() {
         while (!get_exit_flag()) {
-            std::string ps1_default = "sushi> ";
+	  // DZ: The default prompt is DEFAULT_PROMPT
+	  // std::string ps1_default = "sushi> ";
             std::string *ps1_val = Sushi::getenv("PS1");
             std::string ps1 = ps1_val ? *ps1_val : "";
             delete ps1_val;
             if (ps1.empty()) {
-                ps1 = ps1_default;
+	      ps1 = DEFAULT_PROMPT/*ps1_default*/;
             }
     
             // Output Prompt
@@ -195,7 +201,7 @@ void Sushi::mainloop() {
                 store_to_history(line);
             }
         }
-        std::cout << "Shell exiting...\n";
+        // std::cout << "Shell exiting...\n";
 }
 
 char* const* Program::vector2array() {
