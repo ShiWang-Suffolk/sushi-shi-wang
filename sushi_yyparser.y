@@ -41,7 +41,7 @@
 cmdline: 
 %empty /* an empty line is valid, too! Do nothing */ 
 | redir_exe bg_mode    { my_shell.spawn($1, $2); }
-| in_exe pipe bg_mode  { $1->set_pipe($2); my_shell.spawn($1, $3); }
+| in_exe pipe bg_mode { $2->set_pipe($1); my_shell.spawn($2, $3); }
 | arg YY_SUSHI_SET arg { my_shell.putenv($1, $3); }
 | YY_SUSHI_PWD         // Not implemented yet
 | YY_SUSHI_CD arg      // Not implemented yet
@@ -51,7 +51,7 @@ cmdline:
 
 pipe: 
 YY_SUSHI_BAR out_exe  { $$ = $2; }
-| pipe YY_SUSHI_BAR out_exe { $3->set_pipe($1); $$ = $1; }
+| pipe YY_SUSHI_BAR out_exe { $3->set_pipe($1); $$ = $3; }
 
 redir_exe: 
   exe { $$ = $1; }          

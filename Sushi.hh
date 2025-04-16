@@ -23,7 +23,7 @@ class Program {
 private:
   std::vector<std::string*> *args; // Arguments, including the program name
   Redirection redir;
-  Program *pipe; // The previous program in the pipeline, if any; NULL otherwise
+  
 
   // Helper methods
   // Converts the args to whatever `execvp` expects
@@ -37,6 +37,7 @@ public:
   std::string progname() { return *args->at(0); }
   char* const* vector2array();
   void free_array(char *const argv[]);
+  Program *pipe; // The previous program in the pipeline, if any; NULL otherwise
 };
 
 class Sushi {

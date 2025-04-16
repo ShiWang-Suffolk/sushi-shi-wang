@@ -1119,7 +1119,7 @@ yyreduce:
 
   case 4: /* cmdline: in_exe pipe bg_mode  */
 #line 44 "sushi_yyparser.y"
-                       { (yyvsp[-2].p)->set_pipe((yyvsp[-1].p)); my_shell.spawn((yyvsp[-2].p), (yyvsp[0].b)); }
+                      { (yyvsp[-1].p)->set_pipe((yyvsp[-2].p)); my_shell.spawn((yyvsp[-1].p), (yyvsp[0].b)); }
 #line 1124 "sushi_yyparser.tab.c"
     break;
 
@@ -1155,7 +1155,7 @@ yyreduce:
 
   case 12: /* pipe: pipe YY_SUSHI_BAR out_exe  */
 #line 54 "sushi_yyparser.y"
-                            { (yyvsp[0].p)->set_pipe((yyvsp[-2].p)); (yyval.p) = (yyvsp[-2].p); }
+                            { (yyvsp[0].p)->set_pipe((yyvsp[-2].p)); (yyval.p) = (yyvsp[0].p); }
 #line 1160 "sushi_yyparser.tab.c"
     break;
 
