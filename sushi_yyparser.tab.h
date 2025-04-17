@@ -83,9 +83,10 @@ union YYSTYPE
   std::string *s;
   std::vector <std::string*> *s_vec;
   Program *p;
+  Pipe *pp;
   Redirection redir;
 
-#line 89 "sushi_yyparser.tab.h"
+#line 90 "sushi_yyparser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

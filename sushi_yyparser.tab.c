@@ -521,10 +521,10 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    42,    42,    43,    44,    45,    46,    47,    48,    49,
-      50,    53,    54,    57,    58,    61,    62,    65,    66,    69,
-      70,    73,    74,    77,    78,    79,    81,    82,    83,    86,
-      87,    90,    93,    94,    97
+       0,    44,    44,    45,    46,    52,    53,    54,    55,    56,
+      57,    60,    61,    64,    65,    68,    69,    72,    73,    76,
+      77,    80,    81,    84,    85,    86,    88,    89,    90,    93,
+      94,    97,   100,   101,   104
 };
 #endif
 
@@ -1112,187 +1112,204 @@ yyreduce:
   switch (yyn)
     {
   case 3: /* cmdline: redir_exe bg_mode  */
-#line 43 "sushi_yyparser.y"
+#line 45 "sushi_yyparser.y"
                        { my_shell.spawn((yyvsp[-1].p), (yyvsp[0].b)); }
 #line 1118 "sushi_yyparser.tab.c"
     break;
 
   case 4: /* cmdline: in_exe pipe bg_mode  */
-#line 44 "sushi_yyparser.y"
-                      { (yyvsp[-1].p)->set_pipe((yyvsp[-2].p)); my_shell.spawn((yyvsp[-1].p), (yyvsp[0].b)); }
-#line 1124 "sushi_yyparser.tab.c"
+#line 46 "sushi_yyparser.y"
+                       {
+  (yyvsp[-1].pp)->hd()->set_pipe((yyvsp[-2].p));
+  Program *last = (yyvsp[-1].pp)->tl();
+  delete (yyvsp[-1].pp);
+  my_shell.spawn(last, (yyvsp[0].b));
+ }
+#line 1129 "sushi_yyparser.tab.c"
     break;
 
   case 5: /* cmdline: arg YY_SUSHI_SET arg  */
-#line 45 "sushi_yyparser.y"
+#line 52 "sushi_yyparser.y"
                        { my_shell.putenv((yyvsp[-2].s), (yyvsp[0].s)); }
-#line 1130 "sushi_yyparser.tab.c"
+#line 1135 "sushi_yyparser.tab.c"
+    break;
+
+  case 6: /* cmdline: YY_SUSHI_PWD  */
+#line 53 "sushi_yyparser.y"
+                       { my_shell.pwd(); }
+#line 1141 "sushi_yyparser.tab.c"
+    break;
+
+  case 7: /* cmdline: YY_SUSHI_CD arg  */
+#line 54 "sushi_yyparser.y"
+                       { my_shell.cd((yyvsp[0].s)); }
+#line 1147 "sushi_yyparser.tab.c"
     break;
 
   case 8: /* cmdline: YY_SUSHI_HISTORY  */
-#line 48 "sushi_yyparser.y"
+#line 55 "sushi_yyparser.y"
                    { my_shell.show_history(); }
-#line 1136 "sushi_yyparser.tab.c"
+#line 1153 "sushi_yyparser.tab.c"
     break;
 
   case 9: /* cmdline: YY_SUSHI_BANG  */
-#line 49 "sushi_yyparser.y"
+#line 56 "sushi_yyparser.y"
                    { my_shell.re_parse((yyvsp[0].i)); }
-#line 1142 "sushi_yyparser.tab.c"
+#line 1159 "sushi_yyparser.tab.c"
     break;
 
   case 10: /* cmdline: YY_SUSHI_EXIT  */
-#line 50 "sushi_yyparser.y"
+#line 57 "sushi_yyparser.y"
                    { my_shell.set_exit_flag(); }
-#line 1148 "sushi_yyparser.tab.c"
+#line 1165 "sushi_yyparser.tab.c"
     break;
 
   case 11: /* pipe: YY_SUSHI_BAR out_exe  */
-#line 53 "sushi_yyparser.y"
-                      { (yyval.p) = (yyvsp[0].p); }
-#line 1154 "sushi_yyparser.tab.c"
+#line 60 "sushi_yyparser.y"
+                            { (yyval.pp) = new Pipe((yyvsp[0].p)); }
+#line 1171 "sushi_yyparser.tab.c"
     break;
 
   case 12: /* pipe: pipe YY_SUSHI_BAR out_exe  */
-#line 54 "sushi_yyparser.y"
-                            { (yyvsp[0].p)->set_pipe((yyvsp[-2].p)); (yyval.p) = (yyvsp[0].p); }
-#line 1160 "sushi_yyparser.tab.c"
+#line 61 "sushi_yyparser.y"
+                            { (yyvsp[0].p)->set_pipe((yyvsp[-2].pp)->tl()); (yyvsp[-2].pp)->tl((yyvsp[0].p)); (yyval.pp) = (yyvsp[-2].pp); }
+#line 1177 "sushi_yyparser.tab.c"
     break;
 
   case 13: /* redir_exe: exe  */
-#line 57 "sushi_yyparser.y"
+#line 64 "sushi_yyparser.y"
       { (yyval.p) = (yyvsp[0].p); }
-#line 1166 "sushi_yyparser.tab.c"
+#line 1183 "sushi_yyparser.tab.c"
     break;
 
   case 14: /* redir_exe: exe any_redir  */
-#line 58 "sushi_yyparser.y"
+#line 65 "sushi_yyparser.y"
                 { (yyvsp[-1].p)->set_redir((yyvsp[0].redir)); (yyval.p) = (yyvsp[-1].p); }
-#line 1172 "sushi_yyparser.tab.c"
+#line 1189 "sushi_yyparser.tab.c"
     break;
 
   case 15: /* in_exe: exe  */
-#line 61 "sushi_yyparser.y"
+#line 68 "sushi_yyparser.y"
       { (yyval.p) = (yyvsp[0].p); }
-#line 1178 "sushi_yyparser.tab.c"
+#line 1195 "sushi_yyparser.tab.c"
     break;
 
   case 16: /* in_exe: exe in_redir  */
-#line 62 "sushi_yyparser.y"
+#line 69 "sushi_yyparser.y"
                { (yyvsp[-1].p)->set_redir((yyvsp[0].redir)); (yyval.p) = (yyvsp[-1].p); }
-#line 1184 "sushi_yyparser.tab.c"
+#line 1201 "sushi_yyparser.tab.c"
     break;
 
   case 17: /* out_exe: exe  */
-#line 65 "sushi_yyparser.y"
+#line 72 "sushi_yyparser.y"
       { (yyval.p) = (yyvsp[0].p); }
-#line 1190 "sushi_yyparser.tab.c"
+#line 1207 "sushi_yyparser.tab.c"
     break;
 
   case 18: /* out_exe: exe out_redir  */
-#line 66 "sushi_yyparser.y"
+#line 73 "sushi_yyparser.y"
                 { (yyvsp[-1].p)->set_redir((yyvsp[0].redir)); (yyval.p) = (yyvsp[-1].p); }
-#line 1196 "sushi_yyparser.tab.c"
+#line 1213 "sushi_yyparser.tab.c"
     break;
 
   case 19: /* inout_redir: in_redir out_redir  */
-#line 69 "sushi_yyparser.y"
+#line 76 "sushi_yyparser.y"
                      { (yyvsp[0].redir).set_in((yyvsp[-1].redir)); (yyval.redir) = (yyvsp[0].redir); }
-#line 1202 "sushi_yyparser.tab.c"
+#line 1219 "sushi_yyparser.tab.c"
     break;
 
   case 20: /* inout_redir: out_redir in_redir  */
-#line 70 "sushi_yyparser.y"
+#line 77 "sushi_yyparser.y"
                      { (yyvsp[-1].redir).set_in((yyvsp[0].redir)); (yyval.redir) = (yyvsp[-1].redir); }
-#line 1208 "sushi_yyparser.tab.c"
+#line 1225 "sushi_yyparser.tab.c"
     break;
 
   case 21: /* out_redir: out1_redir  */
-#line 73 "sushi_yyparser.y"
+#line 80 "sushi_yyparser.y"
              { (yyval.redir) = (yyvsp[0].redir); }
-#line 1214 "sushi_yyparser.tab.c"
+#line 1231 "sushi_yyparser.tab.c"
     break;
 
   case 22: /* out_redir: out2_redir  */
-#line 74 "sushi_yyparser.y"
+#line 81 "sushi_yyparser.y"
               { (yyval.redir) = (yyvsp[0].redir); }
-#line 1220 "sushi_yyparser.tab.c"
+#line 1237 "sushi_yyparser.tab.c"
     break;
 
   case 23: /* any_redir: in_redir  */
-#line 77 "sushi_yyparser.y"
+#line 84 "sushi_yyparser.y"
             { (yyval.redir) = (yyvsp[0].redir); }
-#line 1226 "sushi_yyparser.tab.c"
+#line 1243 "sushi_yyparser.tab.c"
     break;
 
   case 24: /* any_redir: out_redir  */
-#line 78 "sushi_yyparser.y"
+#line 85 "sushi_yyparser.y"
              { (yyval.redir) = (yyvsp[0].redir); }
-#line 1232 "sushi_yyparser.tab.c"
+#line 1249 "sushi_yyparser.tab.c"
     break;
 
   case 25: /* any_redir: inout_redir  */
-#line 79 "sushi_yyparser.y"
+#line 86 "sushi_yyparser.y"
                { (yyval.redir) = (yyvsp[0].redir); }
-#line 1238 "sushi_yyparser.tab.c"
+#line 1255 "sushi_yyparser.tab.c"
     break;
 
   case 26: /* in_redir: YY_SUSHI_LESS arg  */
-#line 81 "sushi_yyparser.y"
+#line 88 "sushi_yyparser.y"
                                    { (yyval.redir).set_in((yyvsp[0].s)); }
-#line 1244 "sushi_yyparser.tab.c"
+#line 1261 "sushi_yyparser.tab.c"
     break;
 
   case 27: /* out1_redir: YY_SUSHI_MORE arg  */
-#line 82 "sushi_yyparser.y"
+#line 89 "sushi_yyparser.y"
                                    { (yyval.redir).set_out1((yyvsp[0].s)); }
-#line 1250 "sushi_yyparser.tab.c"
+#line 1267 "sushi_yyparser.tab.c"
     break;
 
   case 28: /* out2_redir: YY_SUSHI_MOREMORE arg  */
-#line 83 "sushi_yyparser.y"
+#line 90 "sushi_yyparser.y"
                                    { (yyval.redir).set_out2((yyvsp[0].s)); }
-#line 1256 "sushi_yyparser.tab.c"
+#line 1273 "sushi_yyparser.tab.c"
     break;
 
   case 29: /* bg_mode: %empty  */
-#line 86 "sushi_yyparser.y"
+#line 93 "sushi_yyparser.y"
                { (yyval.b) = false; }
-#line 1262 "sushi_yyparser.tab.c"
+#line 1279 "sushi_yyparser.tab.c"
     break;
 
   case 30: /* bg_mode: YY_SUSHI_AMP  */
-#line 87 "sushi_yyparser.y"
+#line 94 "sushi_yyparser.y"
                { (yyval.b) = true; }
-#line 1268 "sushi_yyparser.tab.c"
+#line 1285 "sushi_yyparser.tab.c"
     break;
 
   case 31: /* exe: args  */
-#line 90 "sushi_yyparser.y"
+#line 97 "sushi_yyparser.y"
        { (yyval.p) = new Program((yyvsp[0].s_vec)); }
-#line 1274 "sushi_yyparser.tab.c"
+#line 1291 "sushi_yyparser.tab.c"
     break;
 
   case 32: /* args: arg  */
-#line 93 "sushi_yyparser.y"
+#line 100 "sushi_yyparser.y"
       { (yyval.s_vec) = new std::vector<std::string*>(); (yyval.s_vec)->push_back((yyvsp[0].s)); }
-#line 1280 "sushi_yyparser.tab.c"
+#line 1297 "sushi_yyparser.tab.c"
     break;
 
   case 33: /* args: args arg  */
-#line 94 "sushi_yyparser.y"
+#line 101 "sushi_yyparser.y"
            { (yyvsp[-1].s_vec)->push_back((yyvsp[0].s)); (yyval.s_vec) = (yyvsp[-1].s_vec); }
-#line 1286 "sushi_yyparser.tab.c"
+#line 1303 "sushi_yyparser.tab.c"
     break;
 
   case 34: /* arg: YY_SUSHI_TOK  */
-#line 97 "sushi_yyparser.y"
+#line 104 "sushi_yyparser.y"
                { (yyval.s) = (yyvsp[0].s); }
-#line 1292 "sushi_yyparser.tab.c"
+#line 1309 "sushi_yyparser.tab.c"
     break;
 
 
-#line 1296 "sushi_yyparser.tab.c"
+#line 1313 "sushi_yyparser.tab.c"
 
       default: break;
     }
@@ -1485,7 +1502,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 99 "sushi_yyparser.y"
+#line 106 "sushi_yyparser.y"
 
 
 /* This section is empty */
