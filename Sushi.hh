@@ -10,6 +10,7 @@ private:
   const std::string *redir_in, *redir_out1, *redir_out2;
   
 public:
+  void clear() { redir_out1 = redir_out2 = redir_in = nullptr; }
   void set_out1(std::string *fname) { redir_out1 = fname; }
   void set_out2(std::string *fname) { redir_out2 = fname; }
   void set_in(std::string *fname)   { redir_in = fname; }
@@ -31,6 +32,7 @@ public:
   ~Program();
   void set_pipe(Program *pipe) { this->pipe = pipe; };
   void set_redir(Redirection &redir) { this->redir = redir; };
+  void clear_redir() { redir.clear(); }
   
   // Helper method(s)
   // Converts the args to whatever `execvp` expects

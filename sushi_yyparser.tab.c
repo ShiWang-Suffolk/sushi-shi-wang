@@ -1178,7 +1178,7 @@ yyreduce:
 
   case 13: /* redir_exe: exe  */
 #line 64 "sushi_yyparser.y"
-      { (yyval.p) = (yyvsp[0].p); }
+    { (yyval.p) = (yyvsp[0].p); (yyval.p)->clear_redir(); }
 #line 1183 "sushi_yyparser.tab.c"
     break;
 
@@ -1190,7 +1190,7 @@ yyreduce:
 
   case 15: /* in_exe: exe  */
 #line 68 "sushi_yyparser.y"
-      { (yyval.p) = (yyvsp[0].p); }
+      { (yyval.p) = (yyvsp[0].p); (yyval.p)->clear_redir(); }
 #line 1195 "sushi_yyparser.tab.c"
     break;
 
@@ -1202,7 +1202,7 @@ yyreduce:
 
   case 17: /* out_exe: exe  */
 #line 72 "sushi_yyparser.y"
-      { (yyval.p) = (yyvsp[0].p); }
+      { (yyval.p) = (yyvsp[0].p); (yyval.p)->clear_redir(); }
 #line 1207 "sushi_yyparser.tab.c"
     break;
 

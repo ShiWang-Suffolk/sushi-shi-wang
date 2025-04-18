@@ -61,15 +61,15 @@ pipe:
 | pipe YY_SUSHI_BAR out_exe { $3->set_pipe($1->tl()); $1->tl($3); $$ = $1; }
 
 redir_exe: 
-  exe { $$ = $1; }          
+exe { $$ = $1; $$->clear_redir(); }          
 | exe any_redir { $1->set_redir($2); $$ = $1; }
 
 in_exe:   
-  exe { $$ = $1; }          
+  exe { $$ = $1; $$->clear_redir(); }          
 | exe in_redir { $1->set_redir($2); $$ = $1; }
 
 out_exe:   
-  exe { $$ = $1; }          
+  exe { $$ = $1; $$->clear_redir(); }          
 | exe out_redir { $1->set_redir($2); $$ = $1; }
 
 inout_redir:    
