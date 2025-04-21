@@ -261,6 +261,17 @@ void Sushi::mainloop() {
         
 }
 
+// Two new methods to implement
+void Sushi::pwd()
+{
+  std::cerr << "pwd: not implemented yet" << std::endl;
+}
+
+void Sushi::cd(std::string *s)
+{
+  std::cerr << "cd(" << *s << "): not implemented yet" << std::endl;
+}
+
 char* const* Program::vector2array() {
     if (args==nullptr || args->empty()) {
         return nullptr;

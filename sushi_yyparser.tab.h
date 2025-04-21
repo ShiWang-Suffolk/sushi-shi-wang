@@ -76,16 +76,17 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 7 "sushi_yyparser.y"
+#line 8 "sushi_yyparser.y"
 
   bool b;
   int i;
   std::string *s;
   std::vector <std::string*> *s_vec;
   Program *p;
+  Pipe *pp;
   Redirection redir;
 
-#line 89 "sushi_yyparser.tab.h"
+#line 90 "sushi_yyparser.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
