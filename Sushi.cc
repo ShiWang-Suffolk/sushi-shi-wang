@@ -11,53 +11,48 @@
 #include <cstdlib>
 #include <cstdio>
 
-#include <unistd.h>     
-#include <sys/types.h>  
-#include <sys/wait.h>   
-#include <csignal>      
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <limits.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <csignal>
 #include <signal.h>
-
-
-
 
 bool Sushi::get_exit_flag() const {
     return exit_flag;
 }
+
 void Sushi::set_exit_flag() {
     exit_flag = true;
 }
 
 void Sushi::store_to_history(std::string line) {
     if (line.empty()) return;
-
     if (history.size() == HISTORY_LENGTH) {
         history.pop_back();
     }
     history.insert(history.begin(), line);
 }
 
-
 std::string Sushi::read_line(std::istream& in) {
     std::string line;
     if (!std::getline(in, line)) {
         if (!in.eof() && in.fail()) {
             std::perror("Error reading line");
-            in.clear(); // Clear the error flag to avoid continuous error in the flow state
+            in.clear();
         }
-        // When reading fails or EOF is reached, an empty string is returned.
         return "";
     }
-
     if (line.length() > MAX_INPUT) {
         line = line.substr(0, MAX_INPUT);
         std::cerr << "Line too long, truncated to "
                   << MAX_INPUT << " characters." << std::endl;
     }
-
     if (std::all_of(line.begin(), line.end(), [](char c){ return std::isspace(static_cast<unsigned char>(c)); })) {
         return "";
     }
-
     return line;
 }
 
@@ -70,7 +65,6 @@ bool Sushi::read_config(const char* fname, bool ok_if_missing) {
         return ok_if_missing;
     }
 
-    // Avoid premature exit after blank line or error
     while (true) {
         std::string line = read_line(file);
         if (!file) {
@@ -79,7 +73,6 @@ bool Sushi::read_config(const char* fname, bool ok_if_missing) {
                 file.close();
                 return false;
             }
-            // Encountering EOF or an irrecoverable error, exit the loop
             break;
         }
         if (!line.empty()) {
@@ -90,13 +83,11 @@ bool Sushi::read_config(const char* fname, bool ok_if_missing) {
         }
     }
 
-
     file.close();
     if (file.bad()) {
         std::cerr << "Error occurred after closing file: " << fname << std::endl;
         return false;
     }
-
     return true;
 }
 
@@ -111,7 +102,7 @@ void Sushi::show_history() const {
 int Sushi::spawn(Program *exe, bool bg) {
     if (!exe) return EXIT_FAILURE;
 
-    // Build a vector containing the pipeline commands in execution order.
+    // Collect all programs in the pipeline
     std::vector<Program*> pipeline;
     for (Program* p = exe; p != nullptr; p = p->pipe) {
         pipeline.push_back(p);
@@ -119,96 +110,95 @@ int Sushi::spawn(Program *exe, bool bg) {
     std::reverse(pipeline.begin(), pipeline.end());
 
     std::vector<pid_t> child_pids;
-    int in_fd = STDIN_FILENO;  // Initial input for the first command is standard input
+    int in_fd = STDIN_FILENO;
     int fd[2] = { -1, -1 };
-    // Define a helper lambda to get the command name from a Program instance.
-    auto getCmdName = [](Program* prog) -> std::string {
-        std::string cmdName;
-        char* const* arr = prog->vector2array();
-        if (arr && arr[0]) {
-            cmdName = arr[0];
-        }
-        prog->free_array(arr);
-        return cmdName;
-    };
 
-    // Iterate over the pipeline in execution order
-    for (size_t i = 0; i < pipeline.size(); i++) {
+    // Iterate over each command
+    for (size_t i = 0; i < pipeline.size(); ++i) {
         Program* p = pipeline[i];
-        std::string cmdName = getCmdName(p);
-        
-        // For all but the last command, create a pipe
-        if (i < pipeline.size() - 1) {
+
+        // If not last command, create a new pipe
+        if (i + 1 < pipeline.size()) {
             if (pipe(fd) < 0) {
                 perror("pipe");
                 return EXIT_FAILURE;
             }
-            //Use this to detect how many pipes were created, for now I can only do one. Maybe I'll improve it later
-            fprintf(stderr, "Created pipe: read end = %d, write end = %d\n", fd[0], fd[1]);
-        } else {
-            // For the last command, no new pipe is needed.
-            fd[1] = STDOUT_FILENO; 
         }
-
-        
 
         pid_t pid = fork();
         if (pid < 0) {
             perror("fork");
             return EXIT_FAILURE;
         }
-        if (pid == 0) { // Child process
-            // Redirect standard input
-            if (in_fd != STDIN_FILENO) {
-                if (dup2(in_fd, STDIN_FILENO) < 0) {
-                    perror("dup2 for stdin");
-                    _exit(1);
-                }
+
+        if (pid == 0) {
+            // Child process
+
+            // Extract redirection info
+            auto &R    = p->get_redir();
+            auto *rin  = R.get_in();
+            auto *rout = R.get_out1();
+            auto *rapp = R.get_out2();
+
+            // stdin: file redirection or pipe
+            if (rin) {
+                int fdin = open(rin->c_str(), O_RDONLY);
+                if (fdin < 0) { perror(rin->c_str()); _exit(EXIT_FAILURE); }
+                dup2(fdin, STDIN_FILENO);
+                close(fdin);
+            } else if (in_fd != STDIN_FILENO) {
+                dup2(in_fd, STDIN_FILENO);
                 close(in_fd);
             }
-            if (i < pipeline.size() - 1) {
-                if (dup2(fd[1], STDOUT_FILENO) < 0) {
-                    perror("dup2 for stdout");
-                    _exit(1);
-                }
-                close(fd[1]);
-                close(fd[0]); // Close read end in child; not needed here
+
+            // stdout: file redirection, pipe, or default stdout
+            if (rout) {
+                int fdout = open(rout->c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+                if (fdout < 0) { perror(rout->c_str()); _exit(EXIT_FAILURE); }
+                dup2(fdout, STDOUT_FILENO);
+                close(fdout);
+            } else if (rapp) {
+                int fdout = open(rapp->c_str(), O_WRONLY | O_CREAT | O_APPEND, 0644);
+                if (fdout < 0) { perror(rapp->c_str()); _exit(EXIT_FAILURE); }
+                dup2(fdout, STDOUT_FILENO);
+                close(fdout);
+            } else if (i + 1 < pipeline.size()) {
+                dup2(fd[1], STDOUT_FILENO);
             }
-            
-            char *const* argv = p->vector2array();
+
+            // Close pipe file descriptors
+            if (fd[0] >= 0) close(fd[0]);
+            if (fd[1] >= 0) close(fd[1]);
+
+            // Execute command
+            char* const* argv = p->vector2array();
             if (!argv) {
-                perror("vector2array returned null");
+                perror("vector2array");
                 _exit(127);
             }
             execvp(argv[0], argv);
-            perror(argv[0]); // if execvp fails
+            perror(argv[0]);
             p->free_array(argv);
             _exit(EXIT_FAILURE);
-        } else { // Parent process
-            
+        } else {
+            // Parent process
             child_pids.push_back(pid);
-
             if (in_fd != STDIN_FILENO) {
                 close(in_fd);
             }
-            // For all but the last command, the next command's input will come from the read end of the pipe
-            if (i < pipeline.size() - 1) {
+            // Prepare in_fd for next command
+            if (i + 1 < pipeline.size()) {
                 close(fd[1]);
                 in_fd = fd[0];
-                fprintf(stderr, "Parent: Forked: Set in_fd to fd %d for next command\n", in_fd);
             }
         }
     }
 
-    // Wait for all child processes 
+    // Wait for all children if not background job
     if (!bg) {
-        for (pid_t pid : child_pids) {
-            int status = 0;
-            if (waitpid(pid, &status, 0) < 0) {
-                perror("waitpid");
-                return EXIT_FAILURE;
-            }
-            
+        for (pid_t cpid : child_pids) {
+            int status;
+            waitpid(cpid, &status, 0);
         }
     }
     return EXIT_SUCCESS;
@@ -262,34 +252,35 @@ void Sushi::mainloop() {
 }
 
 // Two new methods to implement
-void Sushi::pwd()
-{
-  std::cerr << "pwd: not implemented yet" << std::endl;
+void Sushi::pwd() {
+    char cwd[PATH_MAX];
+    if (getcwd(cwd, sizeof(cwd)) != nullptr) {
+        std::cout << cwd << std::endl;
+    } else {
+        perror("getcwd");
+    }
+}
+// Change directory
+void Sushi::cd(std::string *new_dir) {
+    if (!new_dir) return;
+    if (chdir(new_dir->c_str()) != 0) {
+        // Print error message, e.g., "cd: /some/path: reason"
+        std::string msg = "cd: " + *new_dir;
+        perror(msg.c_str());
+    }
+    delete new_dir;
 }
 
-void Sushi::cd(std::string *s)
-{
-  std::cerr << "cd(" << *s << "): not implemented yet" << std::endl;
-}
-
+// Convert vector of args to argv array
 char* const* Program::vector2array() {
-    if (args==nullptr || args->empty()) {
-        return nullptr;
-    }
-    size_t count=args->size();
-    char** argv=new(std::nothrow) char*[count + 1];
-    if (!argv) {
-        // Failed to allocate memory
-        return nullptr;
-    }
-
-    for (size_t i = 0; i < count; i++) {
-        std::string* s = args->at(i); // strdup dynamically allocates and copies the string content, which needs to be freed later
-        argv[i] = ::strdup(s->c_str());
+    if (!args || args->empty()) return nullptr;
+    size_t count = args->size();// Failed to allocate memory
+    char** argv = new(std::nothrow) char*[count + 1];
+    if (!argv) return nullptr;
+    for (size_t i = 0; i < count; ++i) {
+        argv[i] = ::strdup(args->at(i)->c_str());// strdup dynamically allocates and copies the string content, which needs to be freed later
         if (!argv[i]) {
-            for (size_t j = 0; j < i; j++) {
-                ::free(argv[j]);
-            }
+            for (size_t j = 0; j < i; ++j) ::free(argv[j]);
             delete[] argv;
             return nullptr;
         }
@@ -297,15 +288,15 @@ char* const* Program::vector2array() {
     argv[count] = nullptr;
     return argv;
 }
-
+// Free argv array
 void Program::free_array(char *const argv[]) {
     if (!argv) return;
-    for (size_t i = 0; argv[i] != nullptr; i++) {
+    for (size_t i = 0; argv[i] != nullptr; ++i) {
         ::free(argv[i]);
     }
     delete[] argv;
 }
-
+// Destructor
 Program::~Program() {
-  // Do not implement now
+    // Do not implement now
 }

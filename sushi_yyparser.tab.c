@@ -1257,19 +1257,19 @@ yyreduce:
 
   case 26: /* in_redir: YY_SUSHI_LESS arg  */
 #line 89 "sushi_yyparser.y"
-                                   { (yyval.redir).set_in((yyvsp[0].s)); }
+                                   { (yyval.redir).clear(); (yyval.redir).set_in((yyvsp[0].s)); }
 #line 1262 "sushi_yyparser.tab.c"
     break;
 
   case 27: /* out1_redir: YY_SUSHI_MORE arg  */
 #line 90 "sushi_yyparser.y"
-                                   { (yyval.redir).set_out1((yyvsp[0].s)); }
+                                   { (yyval.redir).clear(); (yyval.redir).set_out1((yyvsp[0].s)); }
 #line 1268 "sushi_yyparser.tab.c"
     break;
 
   case 28: /* out2_redir: YY_SUSHI_MOREMORE arg  */
 #line 91 "sushi_yyparser.y"
-                                   { (yyval.redir).set_out2((yyvsp[0].s)); }
+                                   { (yyval.redir).clear(); (yyval.redir).set_out2((yyvsp[0].s)); }
 #line 1274 "sushi_yyparser.tab.c"
     break;
 

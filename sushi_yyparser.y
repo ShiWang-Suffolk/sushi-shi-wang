@@ -86,9 +86,9 @@ any_redir:
 | out_redir  { $$ = $1; }  
 | inout_redir  { $$ = $1; }
 
-in_redir:   YY_SUSHI_LESS arg      { $$.set_in($2); }
-out1_redir: YY_SUSHI_MORE arg      { $$.set_out1($2); }
-out2_redir: YY_SUSHI_MOREMORE arg  { $$.set_out2($2); }
+in_redir:   YY_SUSHI_LESS arg      { $$.clear(); $$.set_in($2); }
+out1_redir: YY_SUSHI_MORE arg      { $$.clear(); $$.set_out1($2); }
+out2_redir: YY_SUSHI_MOREMORE arg  { $$.clear(); $$.set_out2($2); }
 
 bg_mode: 
  %empty        { $$ = false; }
